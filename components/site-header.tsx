@@ -14,7 +14,7 @@ export function SiteHeader() {
           <div className="w-full flex-1 md:w-auto md:flex-none">
             <Link href="/" className="flex items-center space-x-2 md:hidden">
               <Icons.logo className="h-5 w-5" />
-              <span className="font-bold">PDF TO IMAGES</span>
+              <span className="font-bold">PDF TO PNG</span>
             </Link>
           </div>
           <nav className="flex items-center">

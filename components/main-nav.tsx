@@ -49,7 +49,7 @@ export function MainNav() {
     <div className="mr-4 hidden md:flex">
       <Link href="/" className="mr-6 flex items-center space-x-2">
         <Icons.logo className="h-6 w-6" />
-        <span className="hidden font-bold sm:inline-block">PDF TO IMAGES</span>
+        <span className="hidden font-bold sm:inline-block">PDF TO PNG</span>
       </Link>
       <nav className="flex items-center gap-6 text-sm">
         {navigation.map((item) => (

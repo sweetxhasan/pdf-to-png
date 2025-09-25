@@ -10,15 +10,14 @@ const features = [
   },
   {
     icon: Icons.features,
-    title: "Multiple Formats",
-    description:
-      "Convert PDF pages to PNG, JPEG, or JPG images with perfect clarity and color accuracy. Choose your preferred format.",
+    title: "High Quality",
+    description: "Convert PDF pages to crisp, high-resolution PNG images with perfect clarity and color accuracy.",
   },
   {
     icon: Icons.download,
-    title: "ZIP Download",
+    title: "Instant Download",
     description:
-      "Download individual pages or get all converted images in a convenient ZIP file. No waiting, no queues, just instant results.",
+      "Download individual pages or all converted images at once. No waiting, no queues, just instant results.",
   },
   {
     icon: Icons.privacy,
@@ -29,7 +28,8 @@ const features = [
   {
     icon: Icons.sun,
     title: "Free Forever",
-    description: "Convert unlimited PDF files to images completely free. No registration, no hidden fees, no limits.",
+    description:
+      "Convert unlimited PDF files to PNG images completely free. No registration, no hidden fees, no limits.",
   },
   {
     icon: Icons.features,
@@ -43,10 +43,10 @@ export function FeaturesSection() {
     <section className="container space-y-6 py-8 md:py-12 lg:py-24">
       <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
         <h2 className="font-bold text-3xl leading-[1.1] sm:text-3xl md:text-6xl">
-          Why Choose Our PDF to Images Converter?
+          Why Choose Our PDF to PNG Converter?
         </h2>
         <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-          Experience the fastest, most reliable PDF to image conversion tool with advanced features designed for your
+          Experience the fastest, most reliable PDF to PNG conversion tool with advanced features designed for your
           needs.
         </p>
       </div>
