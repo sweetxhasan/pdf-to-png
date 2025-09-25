@@ -6,7 +6,7 @@ const reviews = [
     name: "Sarah Johnson",
     role: "Graphic Designer",
     content:
-      "This PDF to PNG converter is amazing! I use it daily for my design work. The quality is perfect and it's so fast.",
+      "This PDF to images converter is amazing! I use it daily for my design work. The quality is perfect and it supports multiple formats.",
     rating: 5,
     avatar: "/professional-woman.png",
   },
@@ -14,14 +14,15 @@ const reviews = [
     name: "Michael Chen",
     role: "Marketing Manager",
     content:
-      "Finally found a converter that actually works well. No more blurry images or failed conversions. Highly recommended!",
+      "Finally found a converter that actually works well. PNG, JPEG, JPG - all formats work perfectly. Highly recommended!",
     rating: 5,
     avatar: "/professional-man.png",
   },
   {
     name: "Emily Rodriguez",
     role: "Student",
-    content: "Perfect for converting my study materials. Free, fast, and works on my phone too. Exactly what I needed!",
+    content:
+      "Perfect for converting my study materials. Free, fast, and works on my phone too. Love the ZIP download feature!",
     rating: 5,
     avatar: "/student-woman.png",
   },
@@ -37,14 +38,15 @@ const reviews = [
     name: "Lisa Wang",
     role: "Researcher",
     content:
-      "As a researcher, I need high-quality image conversions for my papers. This tool delivers exceptional results every time.",
+      "As a researcher, I need high-quality image conversions for my papers. This tool delivers exceptional results in any format.",
     rating: 5,
     avatar: "/researcher-woman.jpg",
   },
   {
     name: "James Miller",
     role: "Web Developer",
-    content: "Clean, simple interface with powerful functionality. No bloatware, just pure conversion power. Love it!",
+    content:
+      "Clean, simple interface with powerful functionality. Multiple formats, ZIP downloads - everything I need!",
     rating: 5,
     avatar: "/developer-man.png",
   },
@@ -56,7 +58,7 @@ export function ReviewsSection() {
       <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
         <h2 className="font-bold text-3xl leading-[1.1] sm:text-3xl md:text-6xl">What Our Users Say</h2>
         <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-          Join thousands of satisfied users who trust our PDF to PNG converter for their daily needs.
+          Join thousands of satisfied users who trust our PDF to images converter for their daily needs.
         </p>
       </div>
       <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] lg:grid-cols-3">

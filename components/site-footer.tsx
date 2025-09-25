@@ -40,10 +40,11 @@ export function SiteFooter() {
               <div className="transition-transform group-hover:scale-110">
                 <Icons.logo className="h-6 w-6" />
               </div>
-              <span className="font-bold text-lg">PDF TO PNG</span>
+              <span className="font-bold text-lg">PDF TO IMAGES</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs leading-relaxed">
-              Convert PDF files to high-quality PNG images online for free. Fast, secure, and easy to use.
+              Convert PDF files to high-quality images in PNG, JPEG, or JPG format online for free. Fast, secure, and
+              easy to use.
             </p>
             <div className="flex space-x-2">
               <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
@@ -105,7 +106,7 @@ export function SiteFooter() {
 
         <div className="mt-8 border-t pt-8 animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
           <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
-            <p className="text-sm text-muted-foreground">© 2025 PDF TO PNG. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">© 2025 PDF TO IMAGES. All rights reserved.</p>
             <div className="flex items-center space-x-4">
               <Link
                 href="/privacy"

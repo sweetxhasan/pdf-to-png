@@ -13,11 +13,11 @@ export default function HomePage() {
         <section className="container space-y-6 pb-8 pt-6 md:pb-12 md:pt-10 lg:py-32">
           <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
             <h1 className="font-bold text-3xl leading-[1.1] sm:text-3xl md:text-6xl text-balance">
-              Convert PDF to PNG Online
+              Convert PDF to Images Online
             </h1>
             <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7 text-pretty">
-              Transform your PDF documents into high-quality PNG images instantly. Fast, secure, and completely free. No
-              registration required.
+              Transform your PDF documents into high-quality images in PNG, JPEG, or JPG format instantly. Fast, secure,
+              and completely free. No registration required.
             </p>
           </div>
         </section>

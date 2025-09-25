@@ -6,13 +6,15 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Icons } from "@/components/icons"
 import { cn } from "@/lib/utils"
+import JSZip from "jszip" // Import JSZip
 
 interface ConversionState {
-  status: "idle" | "uploading" | "processing" | "success" | "error"
+  status: "idle" | "uploading" | "processing" | "format-selection" | "success" | "error"
   progress: number
   file: File | null
   images: string[]
   error: string | null
+  selectedFormat: "png" | "jpeg" | "jpg"
 }
 
 export function PDFConverter() {
@@ -22,6 +24,7 @@ export function PDFConverter() {
     file: null,
     images: [],
     error: null,
+    selectedFormat: "png",
   })
   const [isDragOver, setIsDragOver] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -56,8 +59,8 @@ export function PDFConverter() {
     }
   }
 
-  const processPDFWithPDFJS = async (file: File, pdfjsLib: any): Promise<string[]> => {
-    console.log("[v0] Processing PDF with PDF.js...")
+  const processPDFWithPDFJS = async (file: File, pdfjsLib: any, format: string): Promise<string[]> => {
+    console.log("[v0] Processing PDF with PDF.js to", format.toUpperCase())
 
     const arrayBuffer = await file.arrayBuffer()
     console.log("[v0] File read as ArrayBuffer, size:", arrayBuffer.byteLength)
@@ -72,7 +75,7 @@ export function PDFConverter() {
 
     const images: string[] = []
 
-    // Convert each page to PNG
+    // Convert each page to selected format
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       console.log("[v0] Processing page:", pageNum)
 
@@ -91,9 +94,12 @@ export function PDFConverter() {
 
       await page.render(renderContext).promise
 
-      const imageDataUrl = canvas.toDataURL("image/png", 0.95)
+      // Convert to selected format
+      const mimeType = format === "png" ? "image/png" : "image/jpeg"
+      const quality = format === "png" ? 1.0 : 0.95
+      const imageDataUrl = canvas.toDataURL(mimeType, quality)
       images.push(imageDataUrl)
-      console.log("[v0] Page", pageNum, "converted successfully")
+      console.log("[v0] Page", pageNum, "converted to", format.toUpperCase())
 
       // Update progress
       setState((prev) => ({
@@ -105,8 +111,8 @@ export function PDFConverter() {
     return images
   }
 
-  const processPDFWithFallback = async (file: File): Promise<string[]> => {
-    console.log("[v0] Using fallback PDF processing...")
+  const processPDFWithFallback = async (file: File, format: string): Promise<string[]> => {
+    console.log("[v0] Using fallback PDF processing for", format.toUpperCase())
 
     // Read file as text to extract basic info
     const arrayBuffer = await file.arrayBuffer()
@@ -145,7 +151,7 @@ export function PDFConverter() {
     ctx.fillStyle = "#6b7280"
     ctx.fillText(`File: ${file.name}`, canvas.width / 2, 100)
     ctx.fillText(`Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`, canvas.width / 2, 130)
-    ctx.fillText(`Type: PDF Document`, canvas.width / 2, 160)
+    ctx.fillText(`Format: ${format.toUpperCase()}`, canvas.width / 2, 160)
 
     // Content area
     ctx.strokeStyle = "#d1d5db"
@@ -168,7 +174,7 @@ export function PDFConverter() {
       "• Text content maintained",
       "• Images and graphics included",
       "",
-      "Download the PNG version to view",
+      `Download the ${format.toUpperCase()} version to view`,
       "the converted image file.",
     ]
 
@@ -180,11 +186,41 @@ export function PDFConverter() {
     ctx.fillStyle = "#9ca3af"
     ctx.font = "12px Arial"
     ctx.textAlign = "center"
-    ctx.fillText("Converted with PDF to PNG Tool", canvas.width / 2, 780)
+    ctx.fillText("Converted with PDF to Images Tool", canvas.width / 2, 780)
     ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, 800)
 
-    const imageDataUrl = canvas.toDataURL("image/png", 0.95)
+    const mimeType = format === "png" ? "image/png" : "image/jpeg"
+    const quality = format === "png" ? 1.0 : 0.95
+    const imageDataUrl = canvas.toDataURL(mimeType, quality)
     return [imageDataUrl]
+  }
+
+  const createZipFile = async (images: string[], format: string): Promise<Blob> => {
+    // Simple zip creation using JSZip-like functionality
+    const zip = new JSZip() // Use JSZip directly
+
+    if (!zip) {
+      // Fallback: create a simple archive-like structure
+      const files: { name: string; data: string }[] = []
+
+      images.forEach((imageDataUrl, index) => {
+        const fileName = `${state.file?.name.replace(".pdf", "")}_page_${index + 1}.${format}`
+        files.push({ name: fileName, data: imageDataUrl })
+      })
+
+      // Create a simple text file with download links
+      const manifest = files.map((f) => `${f.name}: ${f.data}`).join("\n\n")
+      return new Blob([manifest], { type: "text/plain" })
+    }
+
+    // Use JSZip if available
+    images.forEach((imageDataUrl, index) => {
+      const fileName = `${state.file?.name.replace(".pdf", "")}_page_${index + 1}.${format}`
+      const base64Data = imageDataUrl.split(",")[1]
+      zip.file(fileName, base64Data, { base64: true })
+    })
+
+    return await zip.generateAsync({ type: "blob" })
   }
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -221,10 +257,14 @@ export function PDFConverter() {
       setState((prev) => ({ ...prev, progress: i }))
     }
 
-    setState((prev) => ({ ...prev, status: "processing", progress: 0 }))
+    setState((prev) => ({ ...prev, status: "format-selection", progress: 100 }))
+  }
+
+  const handleFormatSelection = async (format: "png" | "jpeg" | "jpg") => {
+    setState((prev) => ({ ...prev, selectedFormat: format, status: "processing", progress: 0 }))
 
     try {
-      console.log("[v0] Starting PDF conversion...")
+      console.log("[v0] Starting PDF conversion to", format.toUpperCase())
 
       let images: string[] = []
       let pdfjsLib = null
@@ -236,17 +276,17 @@ export function PDFConverter() {
         console.log("[v0] PDF.js initialization failed:", error)
       }
 
-      if (pdfjsLib) {
+      if (pdfjsLib && state.file) {
         try {
-          images = await processPDFWithPDFJS(file, pdfjsLib)
+          images = await processPDFWithPDFJS(state.file, pdfjsLib, format)
           console.log("[v0] PDF.js conversion successful")
         } catch (pdfError) {
           console.log("[v0] PDF.js processing failed, using fallback:", pdfError)
-          images = await processPDFWithFallback(file)
+          images = await processPDFWithFallback(state.file, format)
         }
-      } else {
+      } else if (state.file) {
         console.log("[v0] Using fallback processing...")
-        images = await processPDFWithFallback(file)
+        images = await processPDFWithFallback(state.file, format)
       }
 
       console.log("[v0] Conversion completed successfully, images:", images.length)
@@ -269,7 +309,7 @@ export function PDFConverter() {
     }
   }
 
-  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       handleFileSelect(file)
@@ -279,14 +319,25 @@ export function PDFConverter() {
   const downloadImage = (imageDataUrl: string, index: number) => {
     const link = document.createElement("a")
     link.href = imageDataUrl
-    link.download = `${state.file?.name.replace(".pdf", "")}_page_${index + 1}.png`
+    const extension = state.selectedFormat === "jpeg" ? "jpg" : state.selectedFormat
+    link.download = `${state.file?.name.replace(".pdf", "")}_page_${index + 1}.${extension}`
     link.click()
   }
 
-  const downloadAllImages = () => {
-    state.images.forEach((imageDataUrl, index) => {
-      setTimeout(() => downloadImage(imageDataUrl, index), index * 100)
-    })
+  const downloadAllImages = async () => {
+    try {
+      const zipBlob = await createZipFile(state.images, state.selectedFormat)
+      const link = document.createElement("a")
+      link.href = URL.createObjectURL(zipBlob)
+      const extension = state.selectedFormat === "jpeg" ? "jpg" : state.selectedFormat
+      link.download = `${state.file?.name.replace(".pdf", "")}_images.zip`
+      link.click()
+    } catch (error) {
+      // Fallback: download images individually
+      state.images.forEach((imageDataUrl, index) => {
+        setTimeout(() => downloadImage(imageDataUrl, index), index * 100)
+      })
+    }
   }
 
   const resetConverter = () => {
@@ -296,6 +347,7 @@ export function PDFConverter() {
       file: null,
       images: [],
       error: null,
+      selectedFormat: "png",
     })
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
@@ -331,18 +383,71 @@ export function PDFConverter() {
             </div>
           )}
 
-          {(state.status === "uploading" || state.status === "processing") && (
+          {state.status === "uploading" && (
             <div className="flex flex-col items-center space-y-4">
               <div className="rounded-full bg-accent p-4 animate-pulse-slow">
                 <Icons.upload className="h-8 w-8 text-accent-foreground" />
               </div>
               <div className="space-y-2 text-center">
-                <h3 className="text-xl font-semibold">
-                  {state.status === "uploading" ? "Uploading..." : "Converting to PNG..."}
-                </h3>
-                <p className="text-muted-foreground">
-                  {state.status === "uploading" ? "Please wait while we upload your file" : "Processing your PDF pages"}
-                </p>
+                <h3 className="text-xl font-semibold">Uploading...</h3>
+                <p className="text-muted-foreground">Please wait while we upload your file</p>
+              </div>
+              <div className="w-full max-w-md">
+                <Progress value={state.progress} className="h-2" />
+                <p className="text-center text-sm text-muted-foreground mt-2">{Math.round(state.progress)}%</p>
+              </div>
+            </div>
+          )}
+
+          {state.status === "format-selection" && (
+            <div className="flex flex-col items-center space-y-6">
+              <div className="rounded-full bg-accent p-4">
+                <Icons.image className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <div className="space-y-2 text-center">
+                <h3 className="text-xl font-semibold">Select Image Format</h3>
+                <p className="text-muted-foreground">Choose the format for your converted images</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-md">
+                <Button
+                  variant={state.selectedFormat === "png" ? "default" : "outline"}
+                  onClick={() => handleFormatSelection("png")}
+                  className="h-16 flex flex-col space-y-1"
+                >
+                  <Icons.image className="h-5 w-5" />
+                  <span className="font-semibold">PNG</span>
+                  <span className="text-xs opacity-75">High Quality</span>
+                </Button>
+                <Button
+                  variant={state.selectedFormat === "jpeg" ? "default" : "outline"}
+                  onClick={() => handleFormatSelection("jpeg")}
+                  className="h-16 flex flex-col space-y-1"
+                >
+                  <Icons.image className="h-5 w-5" />
+                  <span className="font-semibold">JPEG</span>
+                  <span className="text-xs opacity-75">Smaller Size</span>
+                </Button>
+                <Button
+                  variant={state.selectedFormat === "jpg" ? "default" : "outline"}
+                  onClick={() => handleFormatSelection("jpg")}
+                  className="h-16 flex flex-col space-y-1"
+                >
+                  <Icons.image className="h-5 w-5" />
+                  <span className="font-semibold">JPG</span>
+                  <span className="text-xs opacity-75">Compatible</span>
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {state.status === "processing" && (
+            <div className="flex flex-col items-center space-y-4">
+              <div className="rounded-full bg-accent p-4 animate-pulse-slow">
+                <Icons.image className="h-8 w-8 text-accent-foreground" />
+              </div>
+              <div className="space-y-2 text-center">
+                <h3 className="text-xl font-semibold">Converting to {state.selectedFormat.toUpperCase()}...</h3>
+                <p className="text-muted-foreground">Processing your PDF pages</p>
               </div>
               <div className="w-full max-w-md">
                 <Progress value={state.progress} className="h-2" />
@@ -359,14 +464,15 @@ export function PDFConverter() {
                 </div>
                 <h3 className="text-xl font-semibold text-green-600 dark:text-green-400">Conversion Successful!</h3>
                 <p className="text-muted-foreground">
-                  Your PDF has been converted to {state.images.length} PNG image{state.images.length > 1 ? "s" : ""}
+                  Your PDF has been converted to {state.images.length} {state.selectedFormat.toUpperCase()} image
+                  {state.images.length > 1 ? "s" : ""}
                 </p>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button onClick={downloadAllImages} className="flex-1 sm:flex-none">
                   <Icons.download className="mr-2 h-4 w-4" />
-                  Download All Images
+                  Download ZIP File
                 </Button>
                 <Button variant="outline" onClick={resetConverter} className="flex-1 sm:flex-none bg-transparent">
                   Try Another PDF

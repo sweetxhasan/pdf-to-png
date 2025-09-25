@@ -13,27 +13,29 @@ const openSans = Open_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "PDF to PNG - Convert PDF Files to PNG Images Online | Free PDF Converter",
+  title: "PDF to Images - Convert PDF Files to PNG, JPEG, JPG Online | Free PDF Converter",
   description:
-    "Convert PDF files to high-quality PNG images online for free. Fast, secure, and easy-to-use PDF to PNG converter. No registration required.",
-  keywords: "PDF to PNG, convert PDF, PDF converter, PNG converter, online converter, free PDF tools",
-  authors: [{ name: "PDF to PNG Converter" }],
-  creator: "PDF to PNG Converter",
-  publisher: "PDF to PNG Converter",
+    "Convert PDF files to high-quality images in PNG, JPEG, or JPG format online for free. Fast, secure PDF to images converter with ZIP download. No registration required.",
+  keywords:
+    "PDF to images, PDF to PNG, PDF to JPEG, PDF to JPG, convert PDF, PDF converter, image converter, online converter, free PDF tools, ZIP download",
+  authors: [{ name: "PDF to Images Converter" }],
+  creator: "PDF to Images Converter",
+  publisher: "PDF to Images Converter",
   robots: "index, follow",
   openGraph: {
-    title: "PDF to PNG - Free Online PDF to PNG Converter",
-    description: "Convert PDF files to high-quality PNG images online for free. Fast, secure, and easy-to-use.",
+    title: "PDF to Images - Free Online PDF to Images Converter",
+    description:
+      "Convert PDF files to high-quality PNG, JPEG, or JPG images online for free. Fast, secure, and easy-to-use with ZIP download.",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PDF to PNG - Free Online PDF to PNG Converter",
-    description: "Convert PDF files to high-quality PNG images online for free.",
+    title: "PDF to Images - Free Online PDF to Images Converter",
+    description: "Convert PDF files to PNG, JPEG, or JPG images online for free with ZIP download.",
   },
   viewport: "width=device-width, initial-scale=1",
-  generator: "PDF to PNG Converter",
+  generator: "PDF to Images Converter",
 }
 
 export default function RootLayout({
